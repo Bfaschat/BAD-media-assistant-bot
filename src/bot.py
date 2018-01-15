@@ -28,7 +28,6 @@ with open('token.secret', 'r') as tokenfile:
 BANNED = ()
 ADMINS = tuple(open('admins.secret', 'r'))  # Be careful: tuple fills by str
 
-
 active_chats = {
 }
 videos = {
@@ -139,34 +138,25 @@ class Handlers:
         except BadRequest:
             pass
         # handle malformed requests - read more below!
-        except TimedOut as e:
-            bot.send_message(chat_id=update.message.chat_id, text="TimedOut error. Sorry :(\n{}".format(str(e)))
+        except TimedOut:
             pass
         # handle slow connection problems
         except NetworkError:
             pass
         # handle other connection problems
-        except ChatMigrated as e:
+        except ChatMigrated:
             pass
         # the chat_id of a group has changed, use e.new_chat_id instead
-        except TelegramError as e:
-            bot.send_message(chat_id=update.message.chat_id, text="TelegramError. Sorry :(\n{}".format(str(e)))
+        except TelegramError:
             pass
         # handle all other telegram related errors
 
     @staticmethod
     def button_query_handler(bot, update):
         query = update.callback_query
-        if query.data == '/get':
-            Handlers.command_get(bot, query)
-        elif query.data == '/get/link':
-            Handlers.command_get_by_link(bot, query)
-        elif query.data == '/get/search':
-            Handlers.command_get_by_search(bot, query)
-        elif query.data == '/get/*/video':
-            Handlers.command_get_video(bot, query)
-        elif query.data == '/get/*/audio':
-            Handlers.command_get_audio(bot, query)
+
+        if query.data in Handlers.BOT_ACTIONS:
+            Handlers.BOT_ACTIONS[query.data](bot, query)
         else:
             bot.send_message(chat_id=query.message.chat_id,
                              text="DEBUG: No action for '{}'. How sad :(".format(query.data))
@@ -454,6 +444,14 @@ class Handlers:
                               "OK! Send me search query in next message.",
                          chat_id=update.message.chat_id,
                          parse_mode='HTML')
+
+    BOT_ACTIONS = {
+        '/get': command_get.__func__,
+        '/get/link': command_get_by_link.__func__,
+        '/get/search': command_get_by_search.__func__,
+        '/get/*/video': command_get_video.__func__,
+        '/get/*/audio': command_get_audio.__func__,
+    }
 
 
 def main():
