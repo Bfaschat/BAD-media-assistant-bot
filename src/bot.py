@@ -406,7 +406,7 @@ class Handlers:
 
         buttons = [
             [
-                InlineKeyboardButton("Get YouTube video/audio", callback_data='/get'),
+                InlineKeyboardButton("YouTube", callback_data='/get'),
             ],
             [
                 InlineKeyboardButton("Help", callback_data='/help'),
