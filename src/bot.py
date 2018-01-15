@@ -22,11 +22,11 @@ import youtube_dl
 
 APP_FOLDER = os.path.dirname(os.path.realpath(__file__))
 TMP_FOLDER = os.path.join(APP_FOLDER, 'tmp')
-with open('token.txt', 'r') as tokenfile:
+with open('token.secret', 'r') as tokenfile:
     TOKEN = tokenfile.readline()
 
 BANNED = ()
-ADMINS = tuple(open('admins.txt', 'r'))  # Be careful: tuple fills by str
+ADMINS = tuple(open('admins.secret', 'r'))  # Be careful: tuple fills by str
 
 
 active_chats = {
