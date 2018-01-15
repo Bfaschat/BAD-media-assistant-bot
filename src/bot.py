@@ -391,7 +391,6 @@ class Handlers:
         update.message.reply_text("Chats: {}".format(json.dumps(active_chats)))
 
     @staticmethod
-    @restricted
     def command_cancel(bot, update):
         global active_chats
         chat = active_chats.get(update.message.chat_id, None)
