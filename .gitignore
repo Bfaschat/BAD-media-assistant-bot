@@ -3,3 +3,4 @@
 .idea
 /src/tmp/*
 /src/tmp/!.gitignore
+/src/utils/*.ini
