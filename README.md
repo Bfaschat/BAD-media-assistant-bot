@@ -7,8 +7,8 @@ Current version: 0.2
 ### I can:
 1. (beta)Download video/audio from YouTube
 2. (not yet)Convert video from one format to another or to audio
-3. (not yet)Archive-Unarchive files
-4. (not yet)Encrypt/Decrype files or text with strong cipher
+3. (not yet)Zip-Unzip files
+4. (not yet)Encrypt/Decrypt files or text with strong cipher
 
 ### How to use:
 1. Download *bot.py* from **src** folder
