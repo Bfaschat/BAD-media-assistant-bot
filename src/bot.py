@@ -500,7 +500,6 @@ def main():
     dispatcher.add_error_handler(Handlers.error_handler)
 
     if DONT_SLEEP:
-        global dont_sleep_pid
         print("Starting DontSleep tool...")
         dont_sleep_pid = subprocess.Popen([os.path.join(APP_FOLDER, 'utils/DontSleep_x64.exe')])
 
