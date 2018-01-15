@@ -12,6 +12,7 @@ from difflib import SequenceMatcher
 
 import youtube_dl  # Very Affects on the time of first script launch!
 from bs4 import BeautifulSoup
+from telegram import ParseMode
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import (Updater, CommandHandler, MessageHandler,
                           Filters, CallbackQueryHandler)
@@ -36,6 +37,10 @@ audios = [
 ]
 tmp = {
 }
+
+WEBHOOK = False
+SLOW_MODE = True  # True if you have limited resources
+SLOW_MODE_INTERVAL_SECONDS = 15.0  # In seconds. 0.0 if you want default
 
 
 def restricted(func):
@@ -89,7 +94,7 @@ def on_get_video_complete(stream, file_handle):
                                     text="<b>YouTube video downloader tool 🎥</b>\n"
                                          "<i>Uploading...</i>\n"
                                          "Video downloaded successfully! Uploading 💁",
-                                    parse_mode='HTML')
+                                    parse_mode=ParseMode.HTML)
         for recipient in recipients:
             tmp['bot'].send_video(chat_id=recipient, video=open(video, 'rb'), timeout=20)
             tmp['bot'].send_message(chat_id=recipient, text="DONE! Enjoy! 😘")
@@ -117,7 +122,7 @@ def on_get_video_complete(stream, file_handle):
                                         text="<b>YouTube video downloader tool 🎥</b>\n"
                                              "<i>Uploading...</i>\n"
                                              "Video downloaded successfully! Uploading 💁",
-                                        parse_mode='HTML')
+                                        parse_mode=ParseMode.HTML)
             for recipient in recipients:
                 tmp['bot'].send_video(chat_id=recipient, video=open(video, 'rb'), timeout=20)
                 tmp['bot'].send_message(chat_id=recipient, text="DONE! Enjoy! 😘")
@@ -195,7 +200,7 @@ class Handlers:
                 bot.send_message(text="<b>YouTube video downloader tool 🎥</b>\n<i>Step 2 of 3</i>\n"
                                       "<b style='color: red;'>Invalid url!</b> Please try again.",
                                  chat_id=update.message.chat_id,
-                                 parse_mode='HTML')
+                                 parse_mode=ParseMode.HTML)
                 return
 
             user_chat['search_query'] = None
@@ -208,7 +213,7 @@ class Handlers:
                 bot.send_message(text="<b>YouTube video downloader tool 🎥</b>\n<i>Step 2 of 3</i>\n"
                                       "<b style='color: red;'>Too short query!</b> Please try again.",
                                  chat_id=update.message.chat_id,
-                                 parse_mode='HTML')
+                                 parse_mode=ParseMode.HTML)
                 return
 
             user_chat['search_query'] = ' '.join(map(lambda x: x.capitalize(),
@@ -229,7 +234,7 @@ class Handlers:
         reply_markup = InlineKeyboardMarkup(buttons)
         bot.send_message(text="<b>YouTube video downloader tool 🎥</b>\n<i>Step 3 of 3</i>\nWhat content you need?",
                          chat_id=update.message.chat_id,
-                         parse_mode='HTML',
+                         parse_mode=ParseMode.HTML,
                          reply_markup=reply_markup)
 
     @staticmethod
@@ -250,6 +255,8 @@ class Handlers:
         global active_chats
         active_chats[update.message.chat_id] = {'actions': []}
 
+        slow_mode_warning = "I'm running in <i>Slow Mode</i>\n\n" if SLOW_MODE else ""
+
         buttons = [
             [
                 InlineKeyboardButton("YouTube", callback_data='/get'),
@@ -260,7 +267,11 @@ class Handlers:
             ]
         ]
         reply_markup = InlineKeyboardMarkup(buttons)
-        update.message.reply_text("Hello, {}! How can I help you?".format(update.message.chat.first_name),
+        update.message.reply_text("{}Hello, {}! How can I help you?".format(
+                                        slow_mode_warning,
+                                        update.message.chat.first_name
+                                  ),
+                                  parse_mode=ParseMode.HTML,
                                   reply_markup=reply_markup)
 
     @staticmethod
@@ -274,7 +285,7 @@ class Handlers:
         reply_markup = InlineKeyboardMarkup(buttons)
         bot.send_message(text="<b>YouTube video downloader tool 🎥</b>\n<i>Step 1 of 3</i>\nHow do I find video?",
                          chat_id=update.message.chat_id,
-                         parse_mode='HTML',
+                         parse_mode=ParseMode.HTML,
                          reply_markup=reply_markup)
 
     @staticmethod
@@ -287,7 +298,7 @@ class Handlers:
         bot.send_message(text="<b>YouTube video downloader tool 🎥</b>\n<i>Step 2 of 3</i>\n"
                               "OK! Send me link in next message.",
                          chat_id=update.message.chat_id,
-                         parse_mode='HTML')
+                         parse_mode=ParseMode.HTML)
 
     @staticmethod
     def command_get_by_search(bot, update):
@@ -299,7 +310,7 @@ class Handlers:
         bot.send_message(text="<b>YouTube video downloader tool 🎥</b>\n<i>Step 2 of 3</i>\n"
                               "OK! Send me search query in next message.",
                          chat_id=update.message.chat_id,
-                         parse_mode='HTML')
+                         parse_mode=ParseMode.HTML)
 
     @staticmethod
     def command_get_video(bot, update):
@@ -334,7 +345,7 @@ class Handlers:
                          text="<b>YouTube video downloader tool 🎥</b>\n"
                               "<i>Downloading...</i>\n"
                               "Downloading the video. Wait a little bit 👩‍🔬",
-                         parse_mode='HTML')
+                         parse_mode=ParseMode.HTML)
 
         base = "https://youtube.com/watch?v="
         parsed_link = urllib.parse.urlparse(link)
@@ -418,7 +429,7 @@ class Handlers:
                          text="<b>YouTube video downloader tool 🎥</b>\n"
                               "<i>Downloading and converting...</i>\n"
                               "Downloading the video and converting to audio... 👩‍🔬",
-                         parse_mode='HTML')
+                         parse_mode=ParseMode.HTML)
 
         song = os.path.join(TMP_FOLDER, title + ".mp3").strip()
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
@@ -438,7 +449,7 @@ class Handlers:
                          text="<b>YouTube video downloader tool 🎥</b>\n"
                               "<i>Uploading...</i>\n"
                               "Video downloaded and converted successfully. Wait a little bit 👩‍🔬",
-                         parse_mode='HTML')
+                         parse_mode=ParseMode.HTML)
         bot.send_audio(chat_id=update.message.chat_id, audio=open(max_similar_audio, 'rb'))
         bot.send_message(chat_id=update.message.chat_id, text="DONE! Enjoy! 😘")
 
@@ -481,8 +492,15 @@ def main():
     dispatcher.add_handler(MessageHandler(Filters.text, Handlers.messages))
     dispatcher.add_error_handler(Handlers.error_handler)
 
-    print("Started polling")
-    updater.start_polling()
+    if not WEBHOOK:
+        if SLOW_MODE:
+            print("Started polling at SLOW_MODE with INTERVAL={}".format(SLOW_MODE_INTERVAL_SECONDS))
+            updater.start_polling(poll_interval=SLOW_MODE_INTERVAL_SECONDS)
+        else:
+            print("Started polling with standard settings")
+            updater.start_polling()
+    else:
+        raise BaseException("No webhook settings specified! TODO: make webhook")
 
 
 if __name__ == "__main__":
