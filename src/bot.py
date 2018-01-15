@@ -6,6 +6,7 @@ import json
 import re
 import time
 import urllib.parse
+import subprocess
 from urllib.request import urlopen
 from functools import wraps
 from difflib import SequenceMatcher
@@ -38,6 +39,7 @@ audios = [
 tmp = {
 }
 
+DONT_SLEEP = True  # Start "DontSleep" program to prevent PC sleep/hibernate
 WEBHOOK = False
 SLOW_MODE = True  # True if you have limited resources
 SLOW_MODE_INTERVAL_SECONDS = 15.0  # In seconds. 0.0 if you want default
@@ -496,6 +498,11 @@ def main():
     dispatcher.add_handler(CallbackQueryHandler(Handlers.button_query_handler))
     dispatcher.add_handler(MessageHandler(Filters.text, Handlers.messages))
     dispatcher.add_error_handler(Handlers.error_handler)
+
+    if DONT_SLEEP:
+        global dont_sleep_pid
+        print("Starting DontSleep tool...")
+        dont_sleep_pid = subprocess.Popen([os.path.join(APP_FOLDER, 'utils/DontSleep_x64.exe')])
 
     if not WEBHOOK:
         if SLOW_MODE:
