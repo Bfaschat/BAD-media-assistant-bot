@@ -1,5 +1,8 @@
 # Media assistant bot
 
+You can find me at Telegram: <t.me/media_assistant_bot>
+Current version: 0.2
+
 ### I can:
 1. (beta)Download video/audio from YouTube
 2. (not yet)Convert video from one format to another or to audio
