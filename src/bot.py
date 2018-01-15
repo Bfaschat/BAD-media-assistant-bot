@@ -219,6 +219,89 @@ class Handlers:
             bot.send_message(chat_id=update.message.chat_id, text="This action is not supported :(")
 
     @staticmethod
+    def command_get_specify_audio_video(bot, update):
+        buttons = [
+            [
+                InlineKeyboardButton("Video", callback_data='/get/*/video'),
+                InlineKeyboardButton("Audio", callback_data='/get/*/audio')
+            ]
+        ]
+        reply_markup = InlineKeyboardMarkup(buttons)
+        bot.send_message(text="<b>YouTube video downloader tool 🎥</b>\n<i>Step 3 of 3</i>\nWhat content you need?",
+                         chat_id=update.message.chat_id,
+                         parse_mode='HTML',
+                         reply_markup=reply_markup)
+
+    @staticmethod
+    @restricted
+    def command_chats(bot, update):
+        update.message.reply_text("Chats: {}".format(json.dumps(active_chats)))
+
+    @staticmethod
+    def command_cancel(bot, update):
+        global active_chats
+        chat = active_chats.get(update.message.chat_id, None)
+
+        if chat is not None and chat.get('actions', None) is not None:
+            Handlers.command_start(bot, update)
+
+    @staticmethod
+    def command_start(bot, update):
+        global active_chats
+        active_chats[update.message.chat_id] = {'actions': []}
+
+        buttons = [
+            [
+                InlineKeyboardButton("YouTube", callback_data='/get'),
+            ],
+            [
+                InlineKeyboardButton("Help", callback_data='/help'),
+                InlineKeyboardButton("Feedback", callback_data='/feedback')
+            ]
+        ]
+        reply_markup = InlineKeyboardMarkup(buttons)
+        update.message.reply_text("Hello, {}! How can I help you?".format(update.message.chat.first_name),
+                                  reply_markup=reply_markup)
+
+    @staticmethod
+    def command_get(bot, update):
+        buttons = [
+            [
+                InlineKeyboardButton("By link", callback_data='/get/link'),
+                InlineKeyboardButton("Search", callback_data='/get/search'),
+            ]
+        ]
+        reply_markup = InlineKeyboardMarkup(buttons)
+        bot.send_message(text="<b>YouTube video downloader tool 🎥</b>\n<i>Step 1 of 3</i>\nHow do I find video?",
+                         chat_id=update.message.chat_id,
+                         parse_mode='HTML',
+                         reply_markup=reply_markup)
+
+    @staticmethod
+    def command_get_by_link(bot, update):
+        global active_chats
+        if update.message.chat_id not in active_chats:
+            active_chats[update.message.chat_id] = {'actions': []}
+        active_chats[update.message.chat_id]['actions'].append('/get/link')
+
+        bot.send_message(text="<b>YouTube video downloader tool 🎥</b>\n<i>Step 2 of 3</i>\n"
+                              "OK! Send me link in next message.",
+                         chat_id=update.message.chat_id,
+                         parse_mode='HTML')
+
+    @staticmethod
+    def command_get_by_search(bot, update):
+        global active_chats
+        if update.message.chat_id not in active_chats:
+            active_chats[update.message.chat_id] = {'actions': []}
+        active_chats[update.message.chat_id]['actions'].append('/get/search')
+
+        bot.send_message(text="<b>YouTube video downloader tool 🎥</b>\n<i>Step 2 of 3</i>\n"
+                              "OK! Send me search query in next message.",
+                         chat_id=update.message.chat_id,
+                         parse_mode='HTML')
+
+    @staticmethod
     def command_get_video(bot, update):
         if active_chats.get(update.message.chat_id).get('link') is None:
             search_query = active_chats.get(update.message.chat_id).get('search_query')
@@ -279,7 +362,7 @@ class Handlers:
             if d['status'] == 'finished':
                 print("Done with downloading, now converting..")
                 print("Filename:", d['filename'])
-                audios.append(d['filename'][:-(len(d['filename'])-d['filename'].rfind('.'))] + ".mp3")
+                audios.append(d['filename'][:-(len(d['filename']) - d['filename'].rfind('.'))] + ".mp3")
 
         ydl_opts = {
             'format': 'bestaudio/best',
@@ -362,88 +445,12 @@ class Handlers:
         os.remove(max_similar_audio)
 
     @staticmethod
-    def command_get_specify_audio_video(bot, update):
-        buttons = [
-            [
-                InlineKeyboardButton("Video", callback_data='/get/*/video'),
-                InlineKeyboardButton("Audio", callback_data='/get/*/audio')
-            ]
-        ]
-        reply_markup = InlineKeyboardMarkup(buttons)
-        bot.send_message(text="<b>YouTube video downloader tool 🎥</b>\n<i>Step 3 of 3</i>\nWhat content you need?",
-                         chat_id=update.message.chat_id,
-                         parse_mode='HTML',
-                         reply_markup=reply_markup)
+    def command_help(bot, update):
+        bot.send_message(chat_id=update.message.chat_id, text="Help will be available soon!")
 
     @staticmethod
-    @restricted
-    def command_chats(bot, update):
-        update.message.reply_text("Chats: {}".format(json.dumps(active_chats)))
-
-    @staticmethod
-    def command_cancel(bot, update):
-        global active_chats
-        chat = active_chats.get(update.message.chat_id, None)
-
-        if chat is not None and chat.get('actions', None) is not None:
-            Handlers.command_start(bot, update)
-
-
-    @staticmethod
-    def command_start(bot, update):
-        global active_chats
-        active_chats[update.message.chat_id] = {'actions': []}
-
-        buttons = [
-            [
-                InlineKeyboardButton("YouTube", callback_data='/get'),
-            ],
-            [
-                InlineKeyboardButton("Help", callback_data='/help'),
-                InlineKeyboardButton("Feedback", callback_data='/feedback')
-            ]
-        ]
-        reply_markup = InlineKeyboardMarkup(buttons)
-        update.message.reply_text("Hello, {}! How can I help you?".format(update.message.chat.first_name),
-                                  reply_markup=reply_markup)
-
-    @staticmethod
-    def command_get(bot, update):
-        buttons = [
-            [
-                InlineKeyboardButton("By link", callback_data='/get/link'),
-                InlineKeyboardButton("Search", callback_data='/get/search'),
-            ]
-        ]
-        reply_markup = InlineKeyboardMarkup(buttons)
-        bot.send_message(text="<b>YouTube video downloader tool 🎥</b>\n<i>Step 1 of 3</i>\nHow do I find video?",
-                         chat_id=update.message.chat_id,
-                         parse_mode='HTML',
-                         reply_markup=reply_markup)
-
-    @staticmethod
-    def command_get_by_link(bot, update):
-        global active_chats
-        if update.message.chat_id not in active_chats:
-            active_chats[update.message.chat_id] = {'actions': []}
-        active_chats[update.message.chat_id]['actions'].append('/get/link')
-
-        bot.send_message(text="<b>YouTube video downloader tool 🎥</b>\n<i>Step 2 of 3</i>\n"
-                              "OK! Send me link in next message.",
-                         chat_id=update.message.chat_id,
-                         parse_mode='HTML')
-
-    @staticmethod
-    def command_get_by_search(bot, update):
-        global active_chats
-        if update.message.chat_id not in active_chats:
-            active_chats[update.message.chat_id] = {'actions': []}
-        active_chats[update.message.chat_id]['actions'].append('/get/search')
-
-        bot.send_message(text="<b>YouTube video downloader tool 🎥</b>\n<i>Step 2 of 3</i>\n"
-                              "OK! Send me search query in next message.",
-                         chat_id=update.message.chat_id,
-                         parse_mode='HTML')
+    def command_feedback(bot, update):
+        bot.send_message(chat_id=update.message.chat_id, text="Feedback will be available soon!")
 
     BOT_ACTIONS = {
         '/get': command_get.__func__,
@@ -451,6 +458,8 @@ class Handlers:
         '/get/search': command_get_by_search.__func__,
         '/get/*/video': command_get_video.__func__,
         '/get/*/audio': command_get_audio.__func__,
+        '/help': command_help.__func__,
+        '/feedback': command_feedback.__func__
     }
 
 
@@ -461,10 +470,13 @@ def main():
     updater = Updater(TOKEN)
     dispatcher = updater.dispatcher
 
-    dispatcher.add_handler(CommandHandler('chats', Handlers.command_chats))
     dispatcher.add_handler(CommandHandler('start', Handlers.command_start))
-    dispatcher.add_handler(CommandHandler('get', Handlers.command_get))
+    dispatcher.add_handler(CommandHandler('menu', Handlers.command_start))
     dispatcher.add_handler(CommandHandler('cancel', Handlers.command_cancel))
+    dispatcher.add_handler(CommandHandler('get', Handlers.command_get))
+    dispatcher.add_handler(CommandHandler('help', Handlers.command_help))
+    dispatcher.add_handler(CommandHandler('feedback', Handlers.command_feedback))
+    dispatcher.add_handler(CommandHandler('chats', Handlers.command_chats))  # for DEBUG
     dispatcher.add_handler(CallbackQueryHandler(Handlers.button_query_handler))
     dispatcher.add_handler(MessageHandler(Filters.text, Handlers.messages))
     dispatcher.add_error_handler(Handlers.error_handler)
