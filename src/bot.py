@@ -4,12 +4,13 @@ import os
 import logging
 import json
 import re
+import time
 import urllib.parse
 from urllib.request import urlopen
 from functools import wraps
 from difflib import SequenceMatcher
 
-import time
+import youtube_dl  # Very Affects on the time of first script launch!
 from bs4 import BeautifulSoup
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import (Updater, CommandHandler, MessageHandler,
@@ -17,7 +18,6 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler,
 from telegram.error import (TelegramError, Unauthorized, BadRequest,
                             TimedOut, ChatMigrated, NetworkError)
 from pytube import YouTube
-import youtube_dl
 
 
 APP_FOLDER = os.path.dirname(os.path.realpath(__file__))
