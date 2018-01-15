@@ -23,11 +23,11 @@ from pytube import YouTube
 
 APP_FOLDER = os.path.dirname(os.path.realpath(__file__))
 TMP_FOLDER = os.path.join(APP_FOLDER, 'tmp')
-with open('token.secret', 'r') as tokenfile:
+with open(os.path.join(APP_FOLDER, 'token.secret'), 'r') as tokenfile:
     TOKEN = tokenfile.readline()
 
 BANNED = ()
-ADMINS = tuple(open('admins.secret', 'r'))  # Be careful: tuple fills by str
+ADMINS = tuple(open(os.path.join(APP_FOLDER, 'admins.secret'), 'r'))  # Be careful: tuple fills by str
 
 active_chats = {
 }
@@ -377,6 +377,9 @@ class Handlers:
 
         ydl_opts = {
             'format': 'bestaudio/best',
+            'fixup': 'detect_or_warn',
+            # 'verbose': False,
+            'quiet': True,
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'mp3',
@@ -432,9 +435,11 @@ class Handlers:
                          parse_mode=ParseMode.HTML)
 
         song = os.path.join(TMP_FOLDER, title + ".mp3").strip()
+
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             ydl.download([link])
 
+        # Because here file starts converting to .mp3 ?? (in separate thread ?????) and still not completed.
         time.sleep(2)
 
         max_similar = 0.0
