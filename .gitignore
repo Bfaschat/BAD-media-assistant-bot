@@ -1,4 +1,5 @@
 *.secret
 /prev-bot
 .idea
-/src/tmp
+/src/tmp/*
+/src/tmp/!.gitignore
