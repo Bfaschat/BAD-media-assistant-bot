@@ -1,6 +1,6 @@
 # Media assistant bot
 
-You can find me at Telegram: <t.me/media_assistant_bot>
+You can find me at Telegram: <https://t.me/media_assistant_bot>
 Current version: 0.2
 
 ### I can:
